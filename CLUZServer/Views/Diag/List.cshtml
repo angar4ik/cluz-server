@@ -1,0 +1,61 @@
+﻿@model IEnumerable<CLUZServer.Game>
+
+@{
+    ViewData["Title"] = "Game List";
+}
+
+<h1>Game List</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ChangeTimeSpamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GamePin)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Guid)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeFrame)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ChangeTimeSpamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GamePin)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Guid)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeFrame)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.Guid })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

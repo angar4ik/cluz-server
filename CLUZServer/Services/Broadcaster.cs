@@ -1,0 +1,68 @@
+﻿using CLUZServer.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using CLUZServer.Helpers;
+
+namespace CLUZServer.Services
+{
+    public class Broadcaster : BackgroundService
+    {
+        private IHubContext<PlayersHub> _hubContext;
+        private GamePool _gamePool;
+
+        public Broadcaster(GamePool gamePool, IHubContext<PlayersHub> hubContext)
+        {
+            _hubContext = hubContext;
+            _gamePool = gamePool;
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                //every 500ms scan games, players, list for change. if any, broadcast to clients
+                //to appropriate game. Client should validate packets as it's broadcasting
+
+                foreach(Game game in _gamePool.Games.Values)
+                {
+                    if (game.ListChanged)
+                    {
+                        Log.Information("List change in '{game}'", game.Name);
+                        await _hubContext.Clients.All.SendAsync("PlayerListChanged", game.Players.Values.ToList(), game.Guid);
+
+                        game.ListChanged = false;
+                    }
+
+                    if (game.PropChanged)
+                    { 
+                        Log.Information("Prop change in game '{name}'", game.Name);
+                        await _hubContext.Clients.All.SendAsync("GameChanged", game, game.Guid);
+
+                        Results.CheckIfGameEnded(_hubContext, game);
+
+                        game.PropChanged = false;
+                    }
+
+                    foreach (Player p in game.Players.Values)
+                    {
+                        if (p.PropChanged)
+                        {
+                            Log.Information("'{player}' prop change in game '{game}'", p.Name, game.Name);
+                            await _hubContext.Clients.All.SendAsync("PlayerChanged", p, game.Guid);
+
+                            p.PropChanged = false;
+                        }
+                    }
+                }
+
+                await Task.Delay(500);
+            }
+        }
+    }
+}
