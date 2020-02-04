@@ -12,11 +12,11 @@ namespace CLUZServer
 {
     public class Scavenger : BackgroundService
     {
-        //private readonly IHubContext<GamesHub> _hubContext;
-        //public Scavenger(IHubContext<GamesHub> hubContext)
-        //{
-        //    _hubContext = hubContext;
-        //}
+        private readonly IHubContext<PlayersHub> _hubContext;
+        public Scavenger(IHubContext<PlayersHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
 
         GamePool _gamePool;
 
@@ -29,17 +29,22 @@ namespace CLUZServer
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                Guid gameToRemove = Guid.Empty;
+
                 foreach (Game g in _gamePool.Games.Values.ToList())
                 {
                     if ((DateTime.UtcNow - g.ChangeTimeSpamp).TotalHours > 1)
                     {
-                        _gamePool.Games.Remove(g.Guid);
+                        gameToRemove = g.Guid;
                         Log.Information("Game {0} had no changes more than hour, removing from pool", g.Name);
-                        //await _hubContext.Clients.All.SendAsync("RefreshGameList");
                     }
                 }
 
-                //await _hubContext.Clients.All.SendAsync("Ping");
+                if (gameToRemove != Guid.Empty)
+                {
+                    _gamePool.Games.Remove(gameToRemove);
+                    await _hubContext.Clients.All.SendAsync("RefreshGameList");
+                }
 
                 await Task.Delay(60000);
             }

@@ -9,14 +9,25 @@ using System.Threading.Tasks;
 
 namespace CLUZServer.Helpers
 {
-    public static class Results
+    public class Results
     {
-        public static async void CheckIfGameEnded(IHubContext<PlayersHub> hubContext, Game g)
+        private IHubContext<PlayersHub> _hubContext;
+        private GamePool _gamePool;
+
+        public Results(IHubContext<PlayersHub> hubContext, GamePool gamePool)
         {
+            _hubContext = hubContext;
+            _gamePool = gamePool;
+        }
+
+        public async void CheckIfGameEnded(Game g)
+        {
+            bool gameHasEnded = false;
+
             if (IsAnyMafiaLeftInGame(g) != true && g.Status == GameState.Locked)
             {
                 Log.Information("No Mafia left in game {0}. Requesting modal", g.Name);
-                await hubContext.Clients.All.SendAsync("ShowModal", 10, "Citizens won!", true, g.Guid);
+                await _hubContext.Clients.All.SendAsync("ShowModal", 10, "Citizens won!", true, g.Guid);
             }
 
             if (IsAnyMafiaLeftInGame(g) == true
@@ -24,23 +35,30 @@ namespace CLUZServer.Helpers
                 && g.Status == GameState.Locked)
             {
                 Log.Information("No Police left in game {0}. Requesting modal", g.Name);
-                await hubContext.Clients.All.SendAsync("ShowModal", 10, "Mafia won!", true, g.Guid);
+                await _hubContext.Clients.All.SendAsync("ShowModal", 10, "Mafia won!", true, g.Guid);
             }
 
-            Log.Information("Game {0} has {1} active players", g.Name, Helpers.Results.HowManyActiveInGame(g));
+            if (gameHasEnded)
+            {
+                Log.Information("Game '{game}' has ended, removing from the pool", g.Name);
+                _gamePool.Games.Remove(g.Guid);
+                await _hubContext.Clients.All.SendAsync("RefreshGameList");
+            }
+
+            //Log.Information("Game {0} has {1} active players", g.Name, Helpers.Results.HowManyActiveInGame(g));
         }
 
-        public static int HowManyActiveInGame(Game g)
+        public int HowManyActiveInGame(Game g)
         {
             return g.Players.Values.ToList().Count(p => p.Role != PlayerRole.Ghost && p.Role != PlayerRole.Kicked);
         }
-        public static bool IsAnyMafiaLeftInGame(Game g)
+        public bool IsAnyMafiaLeftInGame(Game g)
         {
             int result = g.Players.Values.ToList().Count(p => p.Role == PlayerRole.Mafia);  //TrueForAll(p => p.State == PlayerState.Ready)
 
             //Log.Information("{0} Mafia in game", result);
 
-            if(result > 0)
+            if (result > 0)
             {
                 return true;
             }

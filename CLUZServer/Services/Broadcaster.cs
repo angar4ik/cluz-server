@@ -15,11 +15,13 @@ namespace CLUZServer.Services
     {
         private IHubContext<PlayersHub> _hubContext;
         private GamePool _gamePool;
+        private Results _results;
 
-        public Broadcaster(GamePool gamePool, IHubContext<PlayersHub> hubContext)
+        public Broadcaster(GamePool gamePool, IHubContext<PlayersHub> hubContext, Results results)
         {
             _hubContext = hubContext;
             _gamePool = gamePool;
+            _results = results;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,7 +31,7 @@ namespace CLUZServer.Services
                 //every 500ms scan games, players, list for change. if any, broadcast to clients
                 //to appropriate game. Client should validate packets as it's broadcasting
 
-                foreach(Game game in _gamePool.Games.Values)
+                foreach (Game game in _gamePool.Games.Values)
                 {
                     if (game.ListChanged)
                     {
@@ -40,11 +42,11 @@ namespace CLUZServer.Services
                     }
 
                     if (game.PropChanged)
-                    { 
+                    {
                         Log.Information("Prop change in game '{name}'", game.Name);
                         await _hubContext.Clients.All.SendAsync("GameChanged", game, game.Guid);
 
-                        Results.CheckIfGameEnded(_hubContext, game);
+                        _results.CheckIfGameEnded(game);
 
                         game.PropChanged = false;
                     }

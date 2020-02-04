@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using CLUZServer.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using CLUZServer.Services;
+using CLUZServer.Helpers;
 
 namespace CLUZServer
 {
@@ -33,9 +34,13 @@ namespace CLUZServer
 
             services.AddSingleton<PlayerPool>();
 
+            services.AddSingleton<Results>();
+
             services.AddHostedService<Scavenger>();
 
             services.AddHostedService<Broadcaster>();
+
+
         }
 
 
