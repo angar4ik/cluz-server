@@ -195,14 +195,16 @@ namespace CLUZServer.Hubs
         /// <param name="gameGuid">Game Guid from payload</param>
         public async void RemovePlayerFromGame(Guid playerGuid, Guid gameGuid)
         {
-            _gamePool.Games[gameGuid].RemovePlayerFromGame(playerGuid);
-            Log.Information("Removed player '{0}' from game '{1}'", playerGuid, gameGuid);
+            Game g = _gamePool.Games[gameGuid];
+            g.RemovePlayerFromGame(playerGuid);
+            Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
 
-            //await RemovePlayerFromHubGroup(playerGuid, gameGuid);
-
-            //List<Player> players = GamePool.Games[gameGuid].Players.Values.ToList();
-            //await Clients.Group(gameGuid.ToString()).SendAsync("RefreshPlayerList", players);
-            //Log.Information("Request to refresh players list sent to group '{0}'", gameGuid.ToString());
+            if (g.GameHasEnded && g.Players.Count == 0)
+            {
+                Log.Information("Game '{game}' has ended, removing from the pool", g.Name);
+                _gamePool.Games.Remove(g.Guid);
+                await Clients.All.SendAsync("RefreshGameList");
+            }
 
         }
         #endregion

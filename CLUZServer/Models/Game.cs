@@ -23,6 +23,8 @@ namespace CLUZServer
         public bool ListChanged { get; set; } = false;
         [JsonIgnore]
         public bool AllPlayersReady { get; set; } = false;
+        [JsonIgnore]
+        public bool GameHasEnded { get; set; } = false;
 
         private GameState _status = GameState.Unfilled;
         public GameState Status

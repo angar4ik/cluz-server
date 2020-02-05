@@ -22,13 +22,11 @@ namespace CLUZServer.Helpers
 
         public async void CheckIfGameEnded(Game g)
         {
-            bool gameHasEnded = false;
-
             if (IsAnyMafiaLeftInGame(g) != true && g.Status == GameState.Locked)
             {
                 Log.Information("No Mafia left in game {0}. Requesting modal", g.Name);
                 await _hubContext.Clients.All.SendAsync("ShowModal", 10, "Citizens won!", true, g.Guid);
-                gameHasEnded = true;
+                g.GameHasEnded = true;
             }
 
             if (IsAnyMafiaLeftInGame(g) == true
@@ -37,15 +35,10 @@ namespace CLUZServer.Helpers
             {
                 Log.Information("No Police left in game {0}. Requesting modal", g.Name);
                 await _hubContext.Clients.All.SendAsync("ShowModal", 10, "Mafia won!", true, g.Guid);
-                gameHasEnded = true;
+                g.GameHasEnded = true;
             }
 
-            if (gameHasEnded)
-            {
-                Log.Information("Game '{game}' has ended, removing from the pool", g.Name);
-                _gamePool.Games.Remove(g.Guid);
-                await _hubContext.Clients.All.SendAsync("RefreshGameList");
-            }
+            
 
             //Log.Information("Game {0} has {1} active players", g.Name, Helpers.Results.HowManyActiveInGame(g));
         }
