@@ -14,13 +14,15 @@ namespace CLUZServer
 {
     public class Game
     {
-        public event EventHandler OnAllReady;
+        //public event EventHandler OnAllReady;
         [JsonIgnore]
         public DateTime ChangeTimeSpamp { get; set; } = DateTime.UtcNow;
         [JsonIgnore]
         public bool PropChanged { get; set; } = false;
         [JsonIgnore]
         public bool ListChanged { get; set; } = false;
+        [JsonIgnore]
+        public bool AllPlayersReady { get; set; } = false;
 
         private GameState _status = GameState.Unfilled;
         public GameState Status
@@ -82,7 +84,10 @@ namespace CLUZServer
 
             if (Players.Values.ToList().TrueForAll(p => p.State == PlayerState.Ready))
             {
-                OnAllReady?.Invoke(this, new EventArgs());
+                //OnAllReady?.Invoke(this, new EventArgs());
+                //set a flag all players ready
+                AllPlayersReady = true;
+                //Log.Information("All players ready in '{game}'", Name);
             }
         }
 

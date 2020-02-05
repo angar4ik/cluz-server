@@ -36,9 +36,13 @@ namespace CLUZServer
 
             services.AddSingleton<Results>();
 
+            services.AddSingleton<AllPlayersReady>();
+
             services.AddHostedService<Scavenger>();
 
             services.AddHostedService<Broadcaster>();
+
+            services.AddHostedService<DayIncrementer>();
 
 
         }

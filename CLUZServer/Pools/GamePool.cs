@@ -22,7 +22,7 @@ namespace CLUZServer
         {
             Game newGame = new Game(name, gamePing);
 
-            newGame.OnAllReady += new EventHandler(AllPlayersReady.Handler);
+            //newGame.OnAllReady += new EventHandler(AllPlayersReady.Handler);
 
             Games.Add(newGame.Guid, newGame);
 

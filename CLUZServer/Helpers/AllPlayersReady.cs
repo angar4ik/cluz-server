@@ -7,17 +7,12 @@ using System.Threading.Tasks;
 
 namespace CLUZServer.Helpers
 {
-    public static class AllPlayersReady
+    public class AllPlayersReady
     {
         #region AllPlayersReady
-        /// <summary>
-        /// Algorithm function. Fired up when all players ready for next timeframe
-        /// </summary>
-        /// <param name="sender">Game generated event</param>
-        /// <param name="e"></param>
-        public static void Handler(object sender, EventArgs e)
+        public void Act(Game g)
         {
-            Game g = sender as Game;
+            //Game g = sender as Game;
             Log.Information("GamePool: All players 'Ready' in game '{game}'", g.Name);
 
             #region Kill Results
@@ -58,27 +53,27 @@ namespace CLUZServer.Helpers
                 Log.Information("GamePool: Iterating Timeframe with Raffle in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
                 #endregion
             }
-            else if (g.TimeFrame == 1 && g.Status == GameState.Locked)
-            {
-                #region First Night Iteration
-                g.TimeFrame += 1;
-                g.ResetPlayersReadyState();
-                Log.Information("GamePool: Iterating Timeframe in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
-                #endregion
-            }
-            //else if (g.TimeFrame >= 2 && g.Status == GameState.Locked)
+            //else if (g.TimeFrame == 1 && g.Status == GameState.Locked)
             //{
-            //    #region Regular Iteration
+            //    #region First Night Iteration
             //    g.TimeFrame += 1;
             //    g.ResetPlayersReadyState();
             //    Log.Information("GamePool: Iterating Timeframe in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
             //    #endregion
             //}
+            else if (g.TimeFrame >= 1 && g.Status == GameState.Locked)
+            {
+                #region Regular Iteration
+                g.TimeFrame += 1;
+                g.ResetPlayersReadyState();
+                Log.Information("GamePool: Iterating timeframe for '{game}'. Now is '{time}'", g.Name, g.TimeFrame);
+                #endregion
+            }
 
         }
         #endregion
 
-        private static bool IsDay(Game g)
+        private bool IsDay(Game g)
         {
             int number = g.TimeFrame;
 

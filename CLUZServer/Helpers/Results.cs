@@ -28,6 +28,7 @@ namespace CLUZServer.Helpers
             {
                 Log.Information("No Mafia left in game {0}. Requesting modal", g.Name);
                 await _hubContext.Clients.All.SendAsync("ShowModal", 10, "Citizens won!", true, g.Guid);
+                gameHasEnded = true;
             }
 
             if (IsAnyMafiaLeftInGame(g) == true
@@ -36,6 +37,7 @@ namespace CLUZServer.Helpers
             {
                 Log.Information("No Police left in game {0}. Requesting modal", g.Name);
                 await _hubContext.Clients.All.SendAsync("ShowModal", 10, "Mafia won!", true, g.Guid);
+                gameHasEnded = true;
             }
 
             if (gameHasEnded)
@@ -56,7 +58,7 @@ namespace CLUZServer.Helpers
         {
             int result = g.Players.Values.ToList().Count(p => p.Role == PlayerRole.Mafia);  //TrueForAll(p => p.State == PlayerState.Ready)
 
-            Log.Information("{count} mafia(s) in game", result);
+            //Log.Information("{count} mafia(s) in game", result);
 
             if (result > 0)
             {

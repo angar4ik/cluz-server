@@ -63,7 +63,7 @@ namespace CLUZServer.Services
                     }
                 }
 
-                await Task.Delay(500);
+                await Task.Delay(750);
             }
         }
     }
