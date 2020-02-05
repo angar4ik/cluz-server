@@ -13,16 +13,12 @@ namespace CLUZServer
     public class Scavenger : BackgroundService
     {
         private readonly IHubContext<PlayersHub> _hubContext;
-        public Scavenger(IHubContext<PlayersHub> hubContext)
-        {
-            _hubContext = hubContext;
-        }
+        private GamePool _gamePool;
 
-        GamePool _gamePool;
-
-        public Scavenger(GamePool gamePool)
+        public Scavenger(IHubContext<PlayersHub> hubContext, GamePool gamePool)
         {
             _gamePool = gamePool;
+            _hubContext = hubContext;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

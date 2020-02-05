@@ -35,7 +35,7 @@ namespace CLUZServer.Services
                 {
                     if (game.ListChanged)
                     {
-                        Log.Information("List change in '{game}'", game.Name);
+                        //Log.Information("List change in '{game}'", game.Name);
                         await _hubContext.Clients.All.SendAsync("PlayerListChanged", game.Players.Values.ToList(), game.Guid);
 
                         game.ListChanged = false;
@@ -43,7 +43,7 @@ namespace CLUZServer.Services
 
                     if (game.PropChanged)
                     {
-                        Log.Information("Prop change in game '{name}'", game.Name);
+                        //Log.Information("Prop change in game '{name}'", game.Name);
                         await _hubContext.Clients.All.SendAsync("GameChanged", game, game.Guid);
 
                         _results.CheckIfGameEnded(game);
@@ -55,7 +55,7 @@ namespace CLUZServer.Services
                     {
                         if (p.PropChanged)
                         {
-                            Log.Information("'{player}' prop change in game '{game}'", p.Name, game.Name);
+                            //Log.Information("'{player}' prop change in game '{game}'", p.Name, game.Name);
                             await _hubContext.Clients.All.SendAsync("PlayerChanged", p, game.Guid);
 
                             p.PropChanged = false;

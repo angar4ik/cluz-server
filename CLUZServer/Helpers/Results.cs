@@ -56,7 +56,7 @@ namespace CLUZServer.Helpers
         {
             int result = g.Players.Values.ToList().Count(p => p.Role == PlayerRole.Mafia);  //TrueForAll(p => p.State == PlayerState.Ready)
 
-            //Log.Information("{0} Mafia in game", result);
+            Log.Information("{count} mafia(s) in game", result);
 
             if (result > 0)
             {

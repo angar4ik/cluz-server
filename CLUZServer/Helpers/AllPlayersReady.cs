@@ -18,7 +18,7 @@ namespace CLUZServer.Helpers
         public static void Handler(object sender, EventArgs e)
         {
             Game g = sender as Game;
-            Log.Information("GamePool: All players {0} in game '{1}'", "Ready", g.Name);
+            Log.Information("GamePool: All players 'Ready' in game '{game}'", g.Name);
 
             #region Kill Results
             foreach (Player p in g.Players.Values.ToList())
@@ -28,7 +28,7 @@ namespace CLUZServer.Helpers
             }
             #endregion
 
-            //should only by days
+            //Votes should only by days
             if (IsDay(g) && g.TimeFrame >= 2 && g.Status == GameState.Locked)
             {
                 #region Votes Results
@@ -41,6 +41,7 @@ namespace CLUZServer.Helpers
                     //assign kicked to first guid in sorted list
                     g.Players[playersSortedList[0].Guid].Role = PlayerRole.Kicked;
                 }
+
                 g.ResetVotes();
 
                 Log.Information("Votes over. Kicked name {0}", g.Players[playersSortedList[0].Guid].Name);
@@ -65,14 +66,14 @@ namespace CLUZServer.Helpers
                 Log.Information("GamePool: Iterating Timeframe in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
                 #endregion
             }
-            else if (g.TimeFrame >= 2 && g.Status == GameState.Locked)
-            {
-                #region Regular Iteration
-                g.TimeFrame += 1;
-                g.ResetPlayersReadyState();
-                Log.Information("GamePool: Iterating Timeframe in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
-                #endregion
-            }
+            //else if (g.TimeFrame >= 2 && g.Status == GameState.Locked)
+            //{
+            //    #region Regular Iteration
+            //    g.TimeFrame += 1;
+            //    g.ResetPlayersReadyState();
+            //    Log.Information("GamePool: Iterating Timeframe in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
+            //    #endregion
+            //}
 
         }
         #endregion
