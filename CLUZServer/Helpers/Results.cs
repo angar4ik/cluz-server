@@ -26,6 +26,7 @@ namespace CLUZServer.Helpers
             {
                 Log.Information("No Mafia left in game {0}. Requesting modal", g.Name);
                 await _hubContext.Clients.All.SendAsync("ShowModal", 10, "Citizens won!", true, g.Guid);
+                g.ResetPlayers();
                 g.GameHasEnded = true;
             }
 
@@ -35,6 +36,7 @@ namespace CLUZServer.Helpers
             {
                 Log.Information("No Police left in game {0}. Requesting modal", g.Name);
                 await _hubContext.Clients.All.SendAsync("ShowModal", 10, "Mafia won!", true, g.Guid);
+                g.ResetPlayers();
                 g.GameHasEnded = true;
             }
 

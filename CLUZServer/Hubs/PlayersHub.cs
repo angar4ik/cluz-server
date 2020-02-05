@@ -226,16 +226,21 @@ namespace CLUZServer.Hubs
         /// <param name="gameGuid">Game Guid</param>
         public void PlayerStatusUpdate(PlayerState playerState, Guid PlayerGuid, Guid gameGuid)
         {
-            Game g = _gamePool.Games[gameGuid];
+            try
+            {
+                Game g = _gamePool.Games[gameGuid];
 
-            _playerPool.Players[PlayerGuid].State = playerState;
-            Log.Information("Updated state for player '{0}' in game '{1}' to '{2}'", _playerPool.Players[PlayerGuid].Name, _gamePool.Games[gameGuid].Name, playerState);
-
+                _playerPool.Players[PlayerGuid].State = playerState;
+                Log.Information("Updated state for player '{0}' in game '{1}' to '{2}'", _playerPool.Players[PlayerGuid].Name, _gamePool.Games[gameGuid].Name, playerState);
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("Game '{guid}' not existing anymore", gameGuid);
+            }
+            
             //List<Player> players = GamePool.Games[gameGuid].Players.Values.ToList();
             //await Clients.Group(gameGuid.ToString()).SendAsync("RefreshPlayerList", players);
             //Log.Information("Request to refresh players list sent to group '{0}'", GamePool.Games[gameGuid].Name);
-
-
         }
         #endregion
 

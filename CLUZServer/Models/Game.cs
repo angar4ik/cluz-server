@@ -194,7 +194,7 @@ namespace CLUZServer
             }
         }
 
-        private void ResetPlayers()
+        public void ResetPlayers()
         {
             foreach(Player p in this.Players.Values.ToList())
             {
