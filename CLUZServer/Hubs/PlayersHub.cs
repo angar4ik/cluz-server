@@ -82,9 +82,9 @@ namespace CLUZServer.Hubs
         /// </summary>
         /// <param name="name">Game name from payload</param>
         /// <param name="gamePin">Game pin from payload</param>
-        public async void CreateGame(string name, string gamePin)
+        public async void CreateGame(string name, string gamePin, double minimum)
         {
-            Guid newGameGuid = _gamePool.AddGame(name, gamePin);
+            Guid newGameGuid = _gamePool.AddGame(name, gamePin, minimum);
             Log.Information("New game '{0}' guid '{1}' added to game pool", name, newGameGuid);
 
             //await Clients.Caller.SendAsync("GameGuid", newGameGuid);
@@ -102,7 +102,7 @@ namespace CLUZServer.Hubs
         /// <param name="playerGuid">Client Guid from payload</param>
         /// <param name="gameGuid">Guid of game chosen by client</param>
         /// <returns></returns>
-        public async Task AddPlayerToGame(Guid playerGuid, Guid gameGuid)
+        public void AddPlayerToGame(Guid playerGuid, Guid gameGuid)
         {
             Game game = _gamePool.Games[gameGuid];
 

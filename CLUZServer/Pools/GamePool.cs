@@ -18,9 +18,9 @@ namespace CLUZServer
         }
 
         public Dictionary<Guid, Game> Games { get; set; } = new Dictionary<Guid, Game>();
-        public Guid AddGame(string name, string gamePing)
+        public Guid AddGame(string name, string gamePing, double minimum)
         {
-            Game newGame = new Game(name, gamePing);
+            Game newGame = new Game(name, gamePing, minimum);
 
             //newGame.OnAllReady += new EventHandler(AllPlayersReady.Handler);
 
