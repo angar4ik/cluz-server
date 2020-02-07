@@ -46,6 +46,22 @@ namespace CLUZServer
 
         private int _minimumPlayersCount = 4;
 
+        public int MinimumPlayerCount
+        {
+            get
+            {
+                return _minimumPlayersCount;
+            }
+
+            set
+            {
+                if (value != _minimumPlayersCount)
+                {
+                    _minimumPlayersCount = value;
+                }
+            }
+        }
+
         [JsonIgnore]
         public IDictionary<Guid, Player> Players { get; set; } = new Dictionary<Guid, Player>();
 
@@ -78,7 +94,7 @@ namespace CLUZServer
             Guid = Guid.NewGuid();
             Name = name;
             GamePin = ComputeSha256Hash(gamePin);
-            _minimumPlayersCount = (int)minimum;
+            MinimumPlayerCount = (int)minimum;
         }
 
         private void PlayerPropertyChanged(object sender, PropertyChangedEventArgs e)
