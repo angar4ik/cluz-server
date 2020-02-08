@@ -35,7 +35,7 @@ namespace CLUZServer
         /// Will remove player from dict by connid
         /// </summary>
         /// <param name="connId"></param>
-        public void RemovePlayerFromPool(string connId)
+        public void RemovePlayerFromPoolByConnID(string connId)
         {
             Guid guidPlayerToRemove = GetPlayerGuidByConnectionId(connId);
             if (Players.ContainsKey(guidPlayerToRemove))

@@ -39,15 +39,32 @@ namespace CLUZServer.Hubs
                 
                 if (pGuid != Guid.Empty)
                 {
-                    Guid gGuid = Guid.Empty;
-
-                    gGuid = _gamePool.FindTheGamePlayerBelongsTo(pGuid);
+                    Guid gGuid = _gamePool.FindTheGamePlayerBelongsTo(pGuid);
 
                     if (gGuid != Guid.Empty)
                     {
-                        _gamePool.Games[gGuid].RemovePlayerFromGame(pGuid);
+                        Game g = _gamePool.Games[gGuid];
+                        Player p = _playerPool.Players[pGuid];
 
-                        Log.Information("Player {p} successifuly removed from game {g}", pGuid, gGuid);
+                        if (!(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked))
+                        {
+                            g.RemovePlayerFromGame(pGuid);
+
+                            _playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
+
+                            Log.Information("Player '{name}' successifuly removed from server on disconnection event", p.Name);
+                        }
+                        else
+                        {
+                            Log.Information("Player '{name}' disconnected, but he is '{role}' so leaving him in game and on server until game" +
+                                "{name} ends", p.Name, p.Role.ToString(), g.Name);
+                        }
+
+                        //_gamePool.Games[gGuid].RemovePlayerFromGame(pGuid);
+
+                        //_playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
+
+                        //Log.Information("Player {p} successifuly removed from game {g} on disconnection event", pGuid, gGuid);
                     }
                 }
             }
@@ -56,7 +73,7 @@ namespace CLUZServer.Hubs
                 Log.Error("Client '{0}' diconnected with exception '{1}'", Context.ConnectionId, exception.Message);
             }
 
-            _playerPool.RemovePlayerFromPool(Context.ConnectionId);
+            
 
             await base.OnDisconnectedAsync(exception);
         }
@@ -196,10 +213,27 @@ namespace CLUZServer.Hubs
         public async void RemovePlayerFromGame(Guid playerGuid, Guid gameGuid)
         {
             Game g = _gamePool.Games[gameGuid];
-            g.RemovePlayerFromGame(playerGuid);
-            Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
+            Player p = _playerPool.Players[playerGuid];
+            //if player was ghost or kicked, don't do anything
+            if(!(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked))
+            {
+                g.RemovePlayerFromGame(playerGuid);
 
-            if (g.GameHasEnded && g.Players.Count == 0)
+                Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
+            }
+            else
+            {
+                Log.Information("Player '{name}' is '{role}' so leaving him in game", p.Name, p.Role.ToString());
+                p.State = PlayerState.Ready;
+            }
+
+            //remove game from game pool (check for ghosts and kicked)
+            //count alive players
+            int alivePlayers = g.Players.Values.ToList().FindAll(p => p.Role != PlayerRole.Kicked && p.Role != PlayerRole.Ghost).Count;
+
+            Log.Information("'{count}' alive players in '{game}'", alivePlayers, g.Name);
+
+            if (g.GameHasEnded && alivePlayers == 0)
             {
                 Log.Information("Game '{game}' has ended, removing from the pool", g.Name);
                 _gamePool.Games.Remove(g.Guid);

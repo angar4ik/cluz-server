@@ -101,9 +101,11 @@ namespace CLUZServer
         {
             ChangeTimeSpamp = DateTime.UtcNow;
 
-            if (Players.Values.ToList().TrueForAll(p => p.State == PlayerState.Ready))
+            int howManyPlayersReady = Players.Values.ToList().FindAll(p => p.State == PlayerState.Ready).Count;
+
+            if (howManyPlayersReady >= this.MinimumPlayerCount)
             {
-                //OnAllReady?.Invoke(this, new EventArgs());
+                //game.Players.Count >= game.MinimumPlayerCount
                 //set a flag all players ready
                 AllPlayersReady = true;
                 //Log.Information("All players ready in '{game}'", Name);
@@ -170,11 +172,11 @@ namespace CLUZServer
         {
             if(Players.Count < _minimumPlayersCount)
             {
-                Status = GameState.Unfilled;
+                //Status = GameState.Unfilled;
 
-                TimeFrame = 0;
+                //TimeFrame = 0;
 
-                ResetPlayers();
+                //ResetPlayers();
             }
             else if (Players.Count >= _minimumPlayersCount)
             {
