@@ -267,9 +267,9 @@ namespace CLUZServer.Hubs
                 _playerPool.Players[PlayerGuid].State = playerState;
                 Log.Information("Updated state for player '{0}' in game '{1}' to '{2}'", _playerPool.Players[PlayerGuid].Name, _gamePool.Games[gameGuid].Name, playerState);
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException e)
             {
-                Log.Error("Game '{guid}' not existing anymore", gameGuid);
+                Log.Error(e.Message ,"Game '{guid}' not existing anymore", gameGuid);
             }
             
             //List<Player> players = GamePool.Games[gameGuid].Players.Values.ToList();
