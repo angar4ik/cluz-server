@@ -16,7 +16,7 @@ namespace CLUZServer
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.File("logs/cluz.log", rollingInterval:RollingInterval.Day)
+                .WriteTo.File("logs/cluz.log", outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}", rollingInterval:RollingInterval.Day)
                 .WriteTo.Console(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information)
                 .CreateLogger();
 
