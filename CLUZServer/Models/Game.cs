@@ -155,6 +155,13 @@ namespace CLUZServer
             if (Players.Remove(playerGuid))
             {
                 //GamePropertyChanged("Players");
+                
+                //resetting particular player
+                Player p = Players[playerGuid];
+                p.Role = PlayerRole.None;
+                p.State = PlayerState.Idle;
+                p.VoteCount = 0;
+                p.KillRequest = false;
 
                 CheckGameFulfillment();
 
@@ -219,6 +226,7 @@ namespace CLUZServer
             {
                 p.Role = PlayerRole.None;
                 p.State = PlayerState.Idle;
+                p.KillRequest = false;
                 ResetVotes();
             }
         }

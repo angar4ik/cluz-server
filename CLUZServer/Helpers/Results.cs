@@ -62,5 +62,10 @@ namespace CLUZServer.Helpers
                 return false;
             }
         }
+
+        public void ResetPlayersStateInGame(Game g)
+        {
+
+        }
     }
 }

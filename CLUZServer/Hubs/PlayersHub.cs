@@ -93,6 +93,23 @@ namespace CLUZServer.Hubs
         }
         #endregion
 
+        #region RemovePlayerFromPool
+        public void RemovePlayerFromPool(Guid playerGuid)
+        {
+            try
+            {
+                _playerPool.Players.Remove(playerGuid);
+
+                Log.Information("Removed player '{0}' from pool", playerGuid);
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("Player {name} wasn't found in players pool dict", playerGuid);
+            }
+
+        }
+        #endregion
+
         #region CreateGame
         /// <summary>
         ///  Will fire up after client clicked Create Game button
@@ -212,32 +229,39 @@ namespace CLUZServer.Hubs
         /// <param name="gameGuid">Game Guid from payload</param>
         public async void RemovePlayerFromGame(Guid playerGuid, Guid gameGuid)
         {
-            Game g = _gamePool.Games[gameGuid];
-            Player p = _playerPool.Players[playerGuid];
-            //if player was ghost or kicked, don't do anything
-            if(!(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked))
+            try
             {
-                g.RemovePlayerFromGame(playerGuid);
+                Game g = _gamePool.Games[gameGuid];
+                Player p = _playerPool.Players[playerGuid];
+                //if player was ghost or kicked, don't do anything
+                if(!(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked))
+                {
+                    g.RemovePlayerFromGame(playerGuid);
+                    Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
+                }
+                else
+                {
+                    Log.Information("Player '{name}' is '{role}' so leaving him in game", p.Name, p.Role.ToString());
+                    p.State = PlayerState.Ready;
+                }
 
-                Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
+                //remove game from game pool (check for ghosts and kicked)
+                //count alive players
+                int alivePlayers = g.Players.Values.ToList().FindAll(p => p.Role != PlayerRole.Kicked && p.Role != PlayerRole.Ghost).Count;
+
+                Log.Information("'{count}' alive players in '{game}'", alivePlayers, g.Name);
+
+                if (g.GameHasEnded && alivePlayers == 0)
+                {
+                    Log.Information("Game '{game}' has ended, removing from the pool", g.Name);
+                    g.ResetPlayers();
+                    _gamePool.Games.Remove(g.Guid);
+                    await Clients.All.SendAsync("RefreshGameList");
+                }
             }
-            else
+            catch (KeyNotFoundException)
             {
-                Log.Information("Player '{name}' is '{role}' so leaving him in game", p.Name, p.Role.ToString());
-                p.State = PlayerState.Ready;
-            }
-
-            //remove game from game pool (check for ghosts and kicked)
-            //count alive players
-            int alivePlayers = g.Players.Values.ToList().FindAll(p => p.Role != PlayerRole.Kicked && p.Role != PlayerRole.Ghost).Count;
-
-            Log.Information("'{count}' alive players in '{game}'", alivePlayers, g.Name);
-
-            if (g.GameHasEnded && alivePlayers == 0)
-            {
-                Log.Information("Game '{game}' has ended, removing from the pool", g.Name);
-                _gamePool.Games.Remove(g.Guid);
-                await Clients.All.SendAsync("RefreshGameList");
+                Log.Error("Player {name} wasn't found in dict of game {name}", playerGuid, gameGuid);
             }
 
         }
