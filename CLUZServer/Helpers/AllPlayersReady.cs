@@ -46,10 +46,10 @@ namespace CLUZServer.Helpers
             if (g.TimeFrame == 0 && g.Status == GameState.Filled)
             {
                 #region First Day to Night (Raffle)
-                g.TimeFrame += 1;
                 g.Status = GameState.Locked;
                 g.ResetPlayersReadyState();
                 g.Raffle();
+                g.TimeFrame += 1;
                 Log.Information("GamePool: Iterating Timeframe with Raffle in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
                 #endregion
             }
@@ -64,8 +64,8 @@ namespace CLUZServer.Helpers
             else if (g.TimeFrame >= 1 && g.Status == GameState.Locked)
             {
                 #region Regular Iteration
-                g.TimeFrame += 1;
                 g.ResetPlayersReadyState();
+                g.TimeFrame += 1;
                 Log.Information("GamePool: Iterating timeframe for '{game}'. Now is '{time}'", g.Name, g.TimeFrame);
                 #endregion
             }

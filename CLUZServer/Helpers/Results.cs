@@ -40,8 +40,6 @@ namespace CLUZServer.Helpers
                 g.GameHasEnded = true;
             }
 
-            
-
             //Log.Information("Game {0} has {1} active players", g.Name, Helpers.Results.HowManyActiveInGame(g));
         }
 
