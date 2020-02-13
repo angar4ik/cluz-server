@@ -116,7 +116,7 @@ namespace CLUZServer.Hubs
         /// </summary>
         /// <param name="name">Game name from payload</param>
         /// <param name="gamePin">Game pin from payload</param>
-        public async void CreateGame(string name, string gamePin, double minimum)
+        public async Task<Guid> CreateGame(string name, string gamePin, double minimum)
         {
             Guid newGameGuid = _gamePool.AddGame(name, gamePin, minimum);
             Log.Information("New game '{0}' guid '{1}' added to game pool", name, newGameGuid);
@@ -126,6 +126,8 @@ namespace CLUZServer.Hubs
 
             await Clients.All.SendAsync("RefreshGameList");
             Log.Information("Request to all clients to refresh game list sent");
+
+            return newGameGuid;
         }
         #endregion
 
