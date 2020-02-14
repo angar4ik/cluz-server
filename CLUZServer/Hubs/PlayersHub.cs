@@ -48,11 +48,7 @@ namespace CLUZServer.Hubs
 
                         if (!(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked))
                         {
-                            g.RemovePlayerFromGame(pGuid);
-
-                            _playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
-
-                            Log.Information("Player '{name}' successifuly removed from server on disconnection event", p.Name);
+                            g.RemovePlayer(pGuid);
                         }
                         else
                         {
@@ -60,7 +56,7 @@ namespace CLUZServer.Hubs
                                 "{name} ends", p.Name, p.Role.ToString(), g.Name);
                         }
 
-                        //_gamePool.Games[gGuid].RemovePlayerFromGame(pGuid);
+                        //_gamePool.Games[gGuid].RemovePlayer(pGuid);
 
                         //_playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
 
@@ -73,7 +69,7 @@ namespace CLUZServer.Hubs
                 Log.Error("Client '{0}' diconnected with exception '{1}'", Context.ConnectionId, exception.Message);
             }
 
-            
+            _playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
 
             await base.OnDisconnectedAsync(exception);
         }
@@ -94,19 +90,9 @@ namespace CLUZServer.Hubs
         #endregion
 
         #region RemovePlayerFromPool
-        public void RemovePlayerFromPool(Guid playerGuid)
+        public void RemovePlayerFromPool()
         {
-            try
-            {
-                _playerPool.Players.Remove(playerGuid);
-
-                Log.Information("Removed player '{0}' from pool", playerGuid);
-            }
-            catch (KeyNotFoundException)
-            {
-                Log.Error("Player {name} wasn't found in players pool dict", playerGuid);
-            }
-
+            _playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
         }
         #endregion
 
@@ -236,15 +222,15 @@ namespace CLUZServer.Hubs
                 Game g = _gamePool.Games[gameGuid];
                 Player p = _playerPool.Players[playerGuid];
                 //if player was ghost or kicked, don't do anything
-                if(!(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked))
-                {
-                    g.RemovePlayerFromGame(playerGuid);
-                    Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
-                }
-                else
+                if(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked)
                 {
                     Log.Information("Player '{name}' is '{role}' so leaving him in game", p.Name, p.Role.ToString());
                     p.State = PlayerState.Ready;
+                }
+                else
+                {
+                    g.RemovePlayer(playerGuid);
+                    Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
                 }
 
                 //remove game from game pool (check for ghosts and kicked)

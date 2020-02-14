@@ -23,9 +23,6 @@ namespace CLUZServer
         {
             Player newPlayer = new Player(connId, name, Guid.NewGuid());
 
-            newPlayer.State = PlayerState.Idle;
-            newPlayer.Role = PlayerRole.None;
-
             Players.Add(newPlayer.Guid, newPlayer);
 
             return newPlayer.Guid;

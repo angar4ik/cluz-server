@@ -22,7 +22,8 @@ namespace CLUZServer.Helpers
 
         public async void CheckIfGameEnded(Game g)
         {
-            if (IsAnyMafiaLeftInGame(g) != true && g.Status == GameState.Locked)
+            if (IsAnyMafiaLeftInGame(g) != true
+                && g.Status == GameState.Locked)
             {
                 Log.Information("No Mafia left in game {0}. Requesting modal", g.Name);
                 await _hubContext.Clients.All.SendAsync("ShowModal", 8, "Citizens win!", true, g.Guid);

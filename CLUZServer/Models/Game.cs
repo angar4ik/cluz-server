@@ -150,42 +150,26 @@ namespace CLUZServer
         /// Will remove player from players dict by guid key and will check game fullfillment
         /// </summary>
         /// <param name="playerGuid"></param>
-        public void RemovePlayerFromGame(Guid playerGuid)
+        public void RemovePlayer(Guid playerGuid)
         {
             if (Players.Remove(playerGuid))
             {
-                //GamePropertyChanged("Players");
-                
                 //resetting particular player
-                Player p = Players[playerGuid];
-                p.Role = PlayerRole.None;
-                p.State = PlayerState.Idle;
-                p.VoteCount = 0;
-                p.KillRequest = false;
+                //Players[playerGuid] = new Player(Players[playerGuid].ConnId, Players[playerGuid].Name, playerGuid);
 
                 CheckGameFulfillment();
 
                 ListChanged = true;
-
-                //Log.Information("Game: Player '{0}' left game '{1}'", _playerPool.Players[playerGuid].Name, this.Name);
             }
             else
             {
-                //Log.Warning("Game: Attempt to remove player '{0}' from game '{1}' UNSUCCESSFUL", _playerPool.Players[playerGuid].Name, this.Name);
+                Log.Warning("UNSUCCESSFUL attempt to remove player '{0}' from game '{1}'", Players[playerGuid].Name, this.Name);
             }
         }
 
         private void CheckGameFulfillment()
         {
-            if(Players.Count < _minimumPlayersCount)
-            {
-                //Status = GameState.Unfilled;
-
-                //TimeFrame = 0;
-
-                //ResetPlayers();
-            }
-            else if (Players.Count >= _minimumPlayersCount)
+            if (Players.Count >= _minimumPlayersCount)
             {
                 Status = GameState.Filled;
             }
@@ -222,13 +206,15 @@ namespace CLUZServer
 
         public void ResetPlayers()
         {
-            foreach(Player p in this.Players.Values.ToList())
-            {
-                p.Role = PlayerRole.None;
-                p.State = PlayerState.Idle;
-                p.KillRequest = false;
-                ResetVotes();
-            }
+            //foreach(Player p in this.Players.Values.ToList())
+            //{
+            //    p.Role = PlayerRole.None;
+            //    p.State = PlayerState.Idle;
+            //    p.KillRequest = false;
+            //    ResetVotes();
+            //}
+
+            this.Players.Clear();
         }
 
         public void ResetVotes()

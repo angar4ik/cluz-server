@@ -17,6 +17,7 @@ namespace CLUZServer
         private PlayerRole _role = PlayerRole.None;
         private int _voteCount = 0;
         private string _name = "";
+        private bool allowedtovote = false;
         #endregion
 
         #region Properties
@@ -94,6 +95,24 @@ namespace CLUZServer
                 {
                     _role = value;
                     NotifyPropertyChanged("Role");
+                }
+            }
+        }
+
+        public bool AllowedToVote
+        {
+
+            get
+            {
+                return allowedtovote;
+            }
+
+            set
+            {
+                if (value != allowedtovote)
+                {
+                    allowedtovote = value;
+                    NotifyPropertyChanged("AllowedToVote");
                 }
             }
         }
