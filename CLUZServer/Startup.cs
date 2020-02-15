@@ -49,8 +49,6 @@ namespace CLUZServer
             services.AddHostedService<Broadcaster>();
 
             services.AddHostedService<DayIncrementer>();
-
-
         }
 
 

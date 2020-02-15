@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CLUZServer.Models;
 using Serilog;
+using CLUZServer.Helpers;
 
 namespace CLUZServer.Hubs
 {
@@ -12,10 +13,12 @@ namespace CLUZServer.Hubs
     {
         GamePool _gamePool;
         PlayerPool _playerPool;
-        public PlayersHub(GamePool gamePool, PlayerPool playerPool)
+        IHubContext<PlayersHub> _hubContext;
+        public PlayersHub(GamePool gamePool, PlayerPool playerPool, IHubContext<PlayersHub> hubContext)
         {
             _gamePool = gamePool;
             _playerPool = playerPool;
+            _hubContext = hubContext;
         }
 
         #region OnConnectedAsync
@@ -314,6 +317,8 @@ namespace CLUZServer.Hubs
             {
                 _playerPool.Players[kickGuid].VoteCount += 1;
             }
+
+            Voting.AllowRandomPlayerToVote(g, _hubContext);
         }
         #endregion
     }

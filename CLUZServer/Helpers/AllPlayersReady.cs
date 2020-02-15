@@ -1,4 +1,6 @@
-﻿using CLUZServer.Models;
+﻿using CLUZServer.Hubs;
+using CLUZServer.Models;
+using Microsoft.AspNetCore.SignalR;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,13 @@ namespace CLUZServer.Helpers
 {
     public class AllPlayersReady
     {
+        IHubContext<PlayersHub> _hubContext;
+
+        public AllPlayersReady(IHubContext<PlayersHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
+
         #region AllPlayersReady
         public void Act(Game g)
         {
@@ -24,7 +33,7 @@ namespace CLUZServer.Helpers
             #endregion
 
             //Votes should only by days
-            if (IsDay(g) && g.TimeFrame >= 2 && g.Status == GameState.Locked)
+            if (Time.IsDay(g) && g.TimeFrame >= 2 && g.Status == GameState.Locked)
             {
                 #region Votes Results
                 List<Player> playersSortedList = new List<Player>();
@@ -53,38 +62,22 @@ namespace CLUZServer.Helpers
                 Log.Information("GamePool: Iterating Timeframe with Raffle in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
                 #endregion
             }
-            //else if (g.TimeFrame == 1 && g.Status == GameState.Locked)
-            //{
-            //    #region First Night Iteration
-            //    g.TimeFrame += 1;
-            //    g.ResetPlayersReadyState();
-            //    Log.Information("GamePool: Iterating Timeframe in game '{0}' now is '{1}'", g.Name, g.TimeFrame);
-            //    #endregion
-            //}
+
             else if (g.TimeFrame >= 1 && g.Status == GameState.Locked)
             {
                 #region Regular Iteration
                 g.ResetPlayersReadyState();
                 g.TimeFrame += 1;
                 Log.Information("GamePool: Iterating timeframe for '{game}'. Now is '{time}'", g.Name, g.TimeFrame);
+
+                // allowing random player to vote
+                Voting.AllowRandomPlayerToVote(g, _hubContext);
                 #endregion
             }
 
         }
         #endregion
 
-        private bool IsDay(Game g)
-        {
-            int number = g.TimeFrame;
-
-            if (number % 2 == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        
     }
 }
