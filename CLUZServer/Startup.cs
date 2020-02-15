@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,11 +28,12 @@ namespace CLUZServer
             //services.AddControllers()
             //    .AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
 
-            services.AddSignalR(hubOptions =>
-                        {
-                                hubOptions.ClientTimeoutInterval = TimeSpan.FromMinutes(30);
-                                hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(15);
-                            });
+            services.AddSignalR();
+            //services.AddSignalR(hubOptions =>
+            //    {
+            //        hubOptions.ClientTimeoutInterval = TimeSpan.FromMinutes(30);
+            //        hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(15);
+            //    });
             //   .AddMessagePackProtocol();
 
             services.AddSingleton<GamePool>();

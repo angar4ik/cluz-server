@@ -33,41 +33,41 @@ namespace CLUZServer.Hubs
         {
             Log.Information("OnDisconnected: Removing player connid '{0}'", Context.ConnectionId);
 
-            if (exception == null)
-            {
-                Guid pGuid = _playerPool.GetPlayerGuidByConnectionId(Context.ConnectionId);
+            //if (exception == null)
+            //{
+            //    Guid pGuid = _playerPool.GetPlayerGuidByConnectionId(Context.ConnectionId);
                 
-                if (pGuid != Guid.Empty)
-                {
-                    Guid gGuid = _gamePool.FindTheGamePlayerBelongsTo(pGuid);
+            //    if (pGuid != Guid.Empty)
+            //    {
+            //        Guid gGuid = _gamePool.FindTheGamePlayerBelongsTo(pGuid);
 
-                    if (gGuid != Guid.Empty)
-                    {
-                        Game g = _gamePool.Games[gGuid];
-                        Player p = _playerPool.Players[pGuid];
+            //        if (gGuid != Guid.Empty)
+            //        {
+            //            Game g = _gamePool.Games[gGuid];
+            //            Player p = _playerPool.Players[pGuid];
 
-                        if (!(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked))
-                        {
-                            g.RemovePlayer(pGuid);
-                        }
-                        else
-                        {
-                            Log.Information("Player '{name}' disconnected, but he is '{role}' so leaving him in game and on server until game" +
-                                "{name} ends", p.Name, p.Role.ToString(), g.Name);
-                        }
+            //            if (!(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked))
+            //            {
+            //                g.RemovePlayer(pGuid);
+            //            }
+            //            else
+            //            {
+            //                Log.Information("Player '{name}' disconnected, but he is '{role}' so leaving him in game and on server until game" +
+            //                    "{name} ends", p.Name, p.Role.ToString(), g.Name);
+            //            }
 
-                        //_gamePool.Games[gGuid].RemovePlayer(pGuid);
+            //            //_gamePool.Games[gGuid].RemovePlayer(pGuid);
 
-                        //_playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
+            //            //_playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
 
-                        //Log.Information("Player {p} successifuly removed from game {g} on disconnection event", pGuid, gGuid);
-                    }
-                }
-            }
-            else
-            {
-                Log.Error("Client '{0}' diconnected with exception '{1}'", Context.ConnectionId, exception.Message);
-            }
+            //            //Log.Information("Player {p} successifuly removed from game {g} on disconnection event", pGuid, gGuid);
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    Log.Error("Client '{0}' diconnected with exception '{1}'", Context.ConnectionId, exception.Message);
+            //}
 
             _playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
 
