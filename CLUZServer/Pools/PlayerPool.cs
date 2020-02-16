@@ -34,13 +34,13 @@ namespace CLUZServer
         /// <param name="connId"></param>
         public void RemovePlayerFromPoolByConnID(string connId)
         {
-            Guid guidPlayerToRemove = GetPlayerGuidByConnectionId(connId);
-            if (Players.ContainsKey(guidPlayerToRemove))
+            Player p = GetPlayerByConnectionId(connId);
+            if (Players.ContainsKey(p.Guid))
             {
-                Players.Remove(guidPlayerToRemove);
+                Players.Remove(p.Guid);
             }
             
-            Log.Information("PlayerPool: Player '{0}' linked with '{1}' has been removed from players pool", guidPlayerToRemove, connId);
+            Log.Information("PlayerPool: Player '{name}' linked with '{id}' has been removed from players pool", p.Name, connId);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace CLUZServer
         /// </summary>
         /// <param name="ConnId">Connection Id to seach for</param>
         /// <returns>Returns Guid.Empty if not player found</returns>
-        public Guid GetPlayerGuidByConnectionId(string ConnId)
+        public Player GetPlayerByConnectionId(string ConnId)
         {
             if(Players.Count > 0)
             {
@@ -56,12 +56,12 @@ namespace CLUZServer
                 {
                     if(entry.Value.ConnId == ConnId)
                     {
-                        return entry.Key;
+                        return entry.Value;
                     }
                 }
             }
 
-            return Guid.Empty;
+            return null;
         }
     }
 }

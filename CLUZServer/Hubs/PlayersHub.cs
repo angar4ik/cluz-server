@@ -11,9 +11,11 @@ namespace CLUZServer.Hubs
 {
     public class PlayersHub : Hub
     {
+        #region fields
         GamePool _gamePool;
         PlayerPool _playerPool;
         IHubContext<PlayersHub> _hubContext;
+        #endregion
         public PlayersHub(GamePool gamePool, PlayerPool playerPool, IHubContext<PlayersHub> hubContext)
         {
             _gamePool = gamePool;
@@ -36,10 +38,23 @@ namespace CLUZServer.Hubs
         {
             Log.Information("OnDisconnected: Removing player connid '{0}'", Context.ConnectionId);
 
+            try
+            {
+                _playerPool.GetPlayerByConnectionId(Context.ConnectionId)?.ExcludeMySelfFromAnyGame(_gamePool);
+
+                _playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
+
+                Log.Information("Player '{connid}' disconnected event", Context.ConnectionId);
+            }
+            catch { }
+
+
+            await base.OnDisconnectedAsync(exception);
+
             //if (exception == null)
             //{
-            //    Guid pGuid = _playerPool.GetPlayerGuidByConnectionId(Context.ConnectionId);
-                
+            //    Guid pGuid = _playerPool.GetPlayerByConnectionId(Context.ConnectionId);
+
             //    if (pGuid != Guid.Empty)
             //    {
             //        Guid gGuid = _gamePool.FindTheGamePlayerBelongsTo(pGuid);
@@ -71,10 +86,6 @@ namespace CLUZServer.Hubs
             //{
             //    Log.Error("Client '{0}' diconnected with exception '{1}'", Context.ConnectionId, exception.Message);
             //}
-
-            _playerPool.RemovePlayerFromPoolByConnID(Context.ConnectionId);
-
-            await base.OnDisconnectedAsync(exception);
         }
         #endregion
 
@@ -224,36 +235,50 @@ namespace CLUZServer.Hubs
             {
                 Game g = _gamePool.Games[gameGuid];
                 Player p = _playerPool.Players[playerGuid];
-                //if player was ghost or kicked, don't do anything
-                if(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked)
-                {
-                    Log.Information("Player '{name}' is '{role}' so leaving him in game", p.Name, p.Role.ToString());
-                    p.State = PlayerState.Ready;
-                }
-                else
-                {
-                    g.RemovePlayer(playerGuid);
-                    Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
-                }
 
-                //remove game from game pool (check for ghosts and kicked)
-                //count alive players
-                int alivePlayers = g.Players.Values.ToList().FindAll(p => p.Role != PlayerRole.Kicked && p.Role != PlayerRole.Ghost).Count;
+                g.RemovePlayer(playerGuid);
 
-                Log.Information("'{count}' alive players in '{game}'", alivePlayers, g.Name);
+                Log.Information("Removed player '{name}' from game '{name}' by his will", p.Name, g.Name);
 
-                if (g.GameHasEnded && alivePlayers == 0)
-                {
-                    Log.Information("Game '{game}' has ended, removing from the pool", g.Name);
-                    g.ResetPlayers();
-                    _gamePool.Games.Remove(g.Guid);
-                    await Clients.All.SendAsync("RefreshGameList");
-                }
+                await _hubContext.Clients.All.SendAsync("SnackbarMessage", $"'{p.Name}' left game by will", 5, g.Guid);
             }
-            catch (KeyNotFoundException)
-            {
-                Log.Error("Player {name} wasn't found in dict of game {name}", playerGuid, gameGuid);
-            }
+            catch { }
+
+
+            //try
+            //{
+            //    Game g = _gamePool.Games[gameGuid];
+            //    Player p = _playerPool.Players[playerGuid];
+            //    //if player was ghost or kicked, don't do anything
+            //    if(p.Role == PlayerRole.Ghost || p.Role == PlayerRole.Kicked)
+            //    {
+            //        Log.Information("Player '{name}' is '{role}' so leaving him in game", p.Name, p.Role.ToString());
+            //        p.State = PlayerState.Ready;
+            //    }
+            //    else
+            //    {
+            //        g.RemovePlayer(playerGuid);
+            //        Log.Information("Removed player '{0}' from game '{1}'", playerGuid, g.Name);
+            //    }
+
+            //    //remove game from game pool (check for ghosts and kicked)
+            //    //count alive players
+            //    int alivePlayers = g.Players.Values.ToList().FindAll(p => p.Role != PlayerRole.Kicked && p.Role != PlayerRole.Ghost).Count;
+
+            //    Log.Information("'{count}' alive players in '{game}'", alivePlayers, g.Name);
+
+            //    if (g.GameHasEnded && alivePlayers == 0)
+            //    {
+            //        Log.Information("Game '{game}' has ended, removing from the pool", g.Name);
+            //        g.ResetPlayers();
+            //        _gamePool.Games.Remove(g.Guid);
+            //        await Clients.All.SendAsync("RefreshGameList");
+            //    }
+            //}
+            //catch (KeyNotFoundException)
+            //{
+            //    Log.Error("Player {name} wasn't found in dict of game {name}", playerGuid, gameGuid);
+            //}
 
         }
         #endregion
@@ -307,7 +332,7 @@ namespace CLUZServer.Hubs
         #endregion
 
         #region VoteRequest
-        public void VoteRequest(Guid fromGuid, Guid kickGuid, Guid gameGuid)
+        public async void VoteRequest(Guid fromGuid, Guid kickGuid, Guid gameGuid)
         {
             Game g = _gamePool.Games[gameGuid];
 
@@ -319,6 +344,8 @@ namespace CLUZServer.Hubs
             }
 
             Voting.AllowRandomPlayerToVote(g, _hubContext);
+
+            //await _hubContext.Clients.All.SendAsync("SnackbarMessage", $"'{_playerPool.Players[fromGuid].Name}' voted to kick '{_playerPool.Players[kickGuid].Name}'", 5, g.Guid);
         }
         #endregion
     }

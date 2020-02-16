@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using CLUZServer.Hubs;
 using CLUZServer.Models;
 using Microsoft.AspNetCore.SignalR;
+using Serilog;
 
 namespace CLUZServer
 {
@@ -130,6 +132,19 @@ namespace CLUZServer
             PropChanged = true;
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void ExcludeMySelfFromAnyGame(GamePool gamePool)
+        {
+
+            foreach (Game g in gamePool.Games.Values.ToList())
+            {
+                if(g.Players.TryGetValue(this.Guid, out Player p))
+                {
+                    g.Players.Remove(p.Guid);
+                    Log.Information("Player {name} removed his self from game {name}", p.Name, g.Name);
+                }
+            }
         }
     }
 }

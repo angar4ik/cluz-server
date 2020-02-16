@@ -17,20 +17,20 @@ namespace CLUZServer.Helpers
             {
                 Random rand = new Random();
 
-                while (g.Players.ToList().Exists(p => p.Value.AllowedToVote == false))
+                //this shit should return true if any of active player still have AllowedToVote = false
+                while (g.Players.Values.ToList()
+                    .FindAll(p => p.Role != PlayerRole.Ghost && p.Role != PlayerRole.Kicked).ToList()
+                    .Exists(p => p.AllowedToVote == false))
                 {
                     Player p = g.Players.ElementAt(rand.Next(0, g.Players.Count)).Value;
 
-                    if (p.AllowedToVote == false)
+                    if (p.AllowedToVote == false
+                        && IsPlayerActive(p) == true)
                     {
                         p.AllowedToVote = true;
 
-                        await hubContext.Clients.All.SendAsync("SnackbarMessage", $"'{p.Name}' is voting", 5, g.Guid);
+                        await hubContext.Clients.All.SendAsync("SnackbarMessage", $"'{p.Name}' is voting", 3, g.Guid);
 
-                        break;
-                    }
-                    else
-                    {
                         break;
                     }
                 }
@@ -38,6 +38,18 @@ namespace CLUZServer.Helpers
             else
             {
                 g.Players.ToList().ForEach(p => p.Value.AllowedToVote = false);
+            }
+        }
+
+        private static bool IsPlayerActive(Player p)
+        {
+            if(p.Role != PlayerRole.Ghost && p.Role != PlayerRole.Kicked)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

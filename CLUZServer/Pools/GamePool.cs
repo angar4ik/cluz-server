@@ -31,31 +31,6 @@ namespace CLUZServer
             return newGame.Guid;
         }
 
-        #region FindPlayerInGame
-        /// <summary>
-        /// Search for Game to which Player belongs to
-        /// </summary>
-        /// <param name="pGuid">Player Guid</param>
-        /// <returns>Game Guid</returns>
-        public Guid FindTheGamePlayerBelongsTo(Guid pGuid)
-        {
-            try
-            {
-                foreach (Game g in Games.Values.ToList())
-                {
-                    Player p = g.Players.Values.ToList().Find(p => p.Guid == pGuid);
-                    return g.Guid;
-                }
-                Log.Warning("Player {0} wasn't belong to any game", _playerPool.Players[pGuid].Name);
-                return Guid.Empty;
-            }
-            catch
-            {
-                Log.Warning("Player {0} wasn't belong to any game", _playerPool.Players[pGuid].Name);
-                return Guid.Empty;
-            }
 
-        }
-        #endregion
     }
 }
