@@ -32,7 +32,7 @@ namespace CLUZServer
                     if ((DateTime.UtcNow - g.ChangeTimeSpamp).TotalHours > 1 || g.GameHasEnded == true)
                     {
                         gameToRemove = g.Guid;
-                        Log.Information("Game {0} had no changes more than hour, removing from pool", g.Name);
+                        Log.Information("Removing game {name} from pool", g.Name);
                     }
                 }
 
