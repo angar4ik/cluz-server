@@ -29,7 +29,7 @@ namespace CLUZServer
 
                 foreach (Game g in _gamePool.Games.Values.ToList())
                 {
-                    if ((DateTime.UtcNow - g.ChangeTimeSpamp).TotalHours > 1)
+                    if ((DateTime.UtcNow - g.ChangeTimeSpamp).TotalHours > 1 || g.GameHasEnded == true)
                     {
                         gameToRemove = g.Guid;
                         Log.Information("Game {0} had no changes more than hour, removing from pool", g.Name);

@@ -136,7 +136,8 @@ namespace CLUZServer
                 CheckGameFulfillment();
 
                 ListChanged = true;
-                
+
+                PropChanged = true;
 
                 Log.Information("Game: Player '{0}' added to the game '{1}'", player.Name, this.Name);
             }
@@ -224,6 +225,7 @@ namespace CLUZServer
             foreach (Player p in this.Players.Values.ToList())
             {
                 p.VoteCount = 0;
+                p.HasVoted = false;
             }
         }
 

@@ -20,6 +20,7 @@ namespace CLUZServer
         private int _voteCount = 0;
         private string _name = "";
         private bool allowedtovote = false;
+        private bool hasVoted = false;
         #endregion
 
         #region Properties
@@ -103,7 +104,6 @@ namespace CLUZServer
 
         public bool AllowedToVote
         {
-
             get
             {
                 return allowedtovote;
@@ -115,6 +115,23 @@ namespace CLUZServer
                 {
                     allowedtovote = value;
                     NotifyPropertyChanged("AllowedToVote");
+                }
+            }
+        }
+
+        public bool HasVoted
+        {
+            get
+            {
+                return hasVoted;
+            }
+
+            set
+            {
+                if (value != hasVoted)
+                {
+                    hasVoted = value;
+                    NotifyPropertyChanged("HasVoted");
                 }
             }
         }

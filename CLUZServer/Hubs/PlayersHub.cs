@@ -350,6 +350,8 @@ namespace CLUZServer.Hubs
                 _playerPool.Players[kickGuid].VoteCount += 1;
             }
 
+            _playerPool.Players[fromGuid].HasVoted = true;
+
             Voting.AllowRandomPlayerToVote(g, _hubContext);
 
             //await _hubContext.Clients.All.SendAsync("SnackbarMessage", $"'{_playerPool.Players[fromGuid].Name}' voted to kick '{_playerPool.Players[kickGuid].Name}'", 5, g.Guid);
