@@ -206,13 +206,15 @@ namespace CLUZServer
 
         public void ResetPlayers()
         {
-            //foreach(Player p in this.Players.Values.ToList())
-            //{
-            //    p.Role = PlayerRole.None;
-            //    p.State = PlayerState.Idle;
-            //    p.KillRequest = false;
-            //    ResetVotes();
-            //}
+            //reset player states
+            foreach (Player p in this.Players.Values.ToList())
+            {
+                p.AllowedToVote = false;
+                p.KillRequest = false;
+                p.Role = PlayerRole.None;
+                p.State = PlayerState.Idle;
+                p.VoteCount = 0;
+            }
 
             this.Players.Clear();
         }

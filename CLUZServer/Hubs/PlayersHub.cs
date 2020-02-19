@@ -238,6 +238,13 @@ namespace CLUZServer.Hubs
 
                 g.RemovePlayer(playerGuid);
 
+                //reset player states
+                p.AllowedToVote = false;
+                p.KillRequest = false;
+                p.Role = PlayerRole.None;
+                p.State = PlayerState.Idle;
+                p.VoteCount = 0;
+
                 Log.Information("Removed player '{name}' from game '{name}' by his will", p.Name, g.Name);
 
                 await _hubContext.Clients.All.SendAsync("SnackbarMessage", $"'{p.Name}' left game by will", 5, g.Guid);
