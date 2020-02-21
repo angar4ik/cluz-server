@@ -138,7 +138,7 @@ namespace CLUZServer.Hubs
         /// <param name="playerGuid">Client Guid from payload</param>
         /// <param name="gameGuid">Guid of game chosen by client</param>
         /// <returns></returns>
-        public void AddPlayerToGame(Guid playerGuid, Guid gameGuid)
+        public async void AddPlayerToGame(Guid playerGuid, Guid gameGuid)
         {
             Game game = _gamePool.Games[gameGuid];
 
@@ -245,9 +245,11 @@ namespace CLUZServer.Hubs
                 p.State = PlayerState.Idle;
                 p.VoteCount = 0;
 
+                await Groups.RemoveFromGroupAsync(p.ConnId, g.Guid.ToString());
+
                 Log.Information("Removed player '{name}' from game '{name}' by his will", p.Name, g.Name);
 
-                await _hubContext.Clients.All.SendAsync("SnackbarMessage", $"'{p.Name}' left game by will", 5, g.Guid);
+                await _hubContext.Clients.Group(g.Guid.ToString()).SendAsync("SnackbarMessage", $"'{p.Name}' left game by will", 5);
             }
             catch { }
 
