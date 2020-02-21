@@ -1,4 +1,4 @@
-﻿using CLUZServer.Hubs;
+﻿﻿using CLUZServer.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -36,7 +36,8 @@ namespace CLUZServer.Services
                     if (game.ListChanged && game.GameHasEnded != true)
                     {
                         //Log.Information("List change in '{game}'", game.Name);
-                        await _hubContext.Clients.All.SendAsync("PlayerListChanged", game.Players.Values.ToList(), game.Guid);
+                        //await _hubContext.Clients.All.SendAsync("PlayerListChanged", game.Players.Values.ToList(), game.Guid);
+                        await Clients.Group(game.Guid.ToString()).SendAsync("PlayerListChanged", game.Players.Values.ToList(), game.Guid);
 
                         game.ListChanged = false;
                     }
@@ -44,7 +45,8 @@ namespace CLUZServer.Services
                     if (game.PropChanged && game.GameHasEnded != true)
                     {
                         //Log.Information("Prop change in game '{name}'", game.Name);
-                        await _hubContext.Clients.All.SendAsync("GameChanged", game, game.Guid);
+                        //await _hubContext.Clients.All.SendAsync("GameChanged", game, game.Guid);
+                        await Clients.Group(game.Guid.ToString()).SendAsync("GameChanged", game, game.Guid);
 
                         _results.CheckIfGameEnded(game);
 
@@ -56,7 +58,8 @@ namespace CLUZServer.Services
                         if (p.PropChanged && game.GameHasEnded != true)
                         {
                             //Log.Information("'{player}' prop change in game '{game}'", p.Name, game.Name);
-                            await _hubContext.Clients.All.SendAsync("PlayerChanged", p, game.Guid);
+                            //await _hubContext.Clients.All.SendAsync("PlayerChanged", p, game.Guid);
+                            await Clients.Group(game.Guid.ToString()).SendAsync("PlayerChanged", p, game.Guid);
 
                             p.PropChanged = false;
                         }
