@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿﻿using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -146,9 +146,9 @@ namespace CLUZServer.Hubs
 
             game.AddPlayer(player);
 
-            ////adding player to Hub group named by game GUID
-            //await Groups.AddToGroupAsync(player.ConnId, game.Guid.ToString());
-            //Log.Information("Added player '{0}' to group '{1}'", player.ConnId, game.Guid.ToString());
+            //adding player to Hub group named by game GUID
+            await Groups.AddToGroupAsync(player.ConnId, game.Guid.ToString());
+            Log.Information("Added player '{connid}'('{pname}') to group '{guid}' ('{gname}')", player.ConnId, player.Name,game.Guid, game.Name);
 
             //List<Player> players = GamePool.Games[gameGuid].Players.Values.ToList();
             //await Clients.Group(game.Guid.ToString()).SendAsync("RefreshPlayerList", players);
